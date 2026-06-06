@@ -1,65 +1,28 @@
-import {
-  UseMutateAsyncFunction,
-  useMutation,
-  useQuery,
-} from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
+import { clearStoredSession, loadSession, persistSession } from "@/lib/session";
+import { useQuery } from "@tanstack/react-query";
 import {
   createContext,
+  useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
-
-const SESSION_KEY = "auth.session";
+import { AuthResponse, Credentials, signIn as signInRequest } from "@/api/auth";
 
 type AuthState = {
   token: string | null;
   isLoading: boolean;
 };
 
-type Credentials = {
-  username: string;
-  password: string;
-};
-
 type AuthContextValue = AuthState & {
   isAuthenticated: boolean;
-  signIn: UseMutateAsyncFunction<string, Error, Credentials, unknown>;
-  signUp: UseMutateAsyncFunction<string, Error, Credentials, unknown>;
+  token: string | null;
+  isLoading: boolean;
+  signIn: (credentials: Credentials) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-async function loadSession(): Promise<string | null> {
-  try {
-    const token = await SecureStore.getItemAsync(SESSION_KEY);
-    return token;
-  } catch {
-    return null;
-  }
-}
-
-async function persistSession(token: string): Promise<void> {
-  await SecureStore.setItemAsync(SESSION_KEY, token);
-}
-
-async function clearStoredSession(): Promise<void> {
-  await SecureStore.deleteItemAsync(SESSION_KEY);
-}
-
-async function mockAuthenticate(
-  username: string,
-  password: string,
-): Promise<string> {
-  if (!username.trim()) throw new Error("Username is required");
-  if (!password) throw new Error("Password is required");
-  await new Promise((resolve) => setTimeout(resolve, 400));
-  return `mock.${btoa(username)}.${Date.now()}`;
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const {
@@ -72,47 +35,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initialData: null,
   });
 
-  const { mutateAsync: signInMutation, isPending: isSignInPending } =
-    useMutation({
-      mutationFn: async (credentials: Credentials) => {
-        const token = await mockAuthenticate(
-          credentials.username,
-          credentials.password,
-        );
-        await persistSession(token);
-        return token;
-      },
-    });
+  const signIn = useCallback(
+    async (credentials: Credentials) => {
+      const res = await signInRequest(credentials);
+      await persistSession(res.accessToken);
+      await refetch();
+      return res;
+    },
+    [refetch],
+  );
 
-  const { mutateAsync: signUpMutation, isPending: isSignUpPending } =
-    useMutation({
-      mutationFn: (credentials: Credentials) =>
-        mockAuthenticate(credentials.username, credentials.password),
-    });
-
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await clearStoredSession();
     await refetch();
-  };
+  }, [refetch]);
 
   const value: AuthContextValue = useMemo(
     () => ({
       token,
       isAuthenticated: token !== null,
-      signIn: signInMutation,
-      signUp: signUpMutation,
+      signIn,
       signOut,
-      isLoading: isLoading || isSignInPending || isSignUpPending,
+      isLoading: isLoading,
     }),
-    [
-      token,
-      isLoading,
-      isSignInPending,
-      isSignUpPending,
-      signInMutation,
-      signUpMutation,
-      signOut,
-    ],
+    [token, isLoading, signIn, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

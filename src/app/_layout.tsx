@@ -5,12 +5,16 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { Loading } from "@/components/ui/Loading";
 
 function AppStack() {
-  const { isLoading } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
   if (isLoading) return <Loading />;
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="login" />
-      <Stack.Screen name="home" />
+      <Stack.Protected guard={isAuthenticated}>
+        <Stack.Screen name="home" />
+      </Stack.Protected>
+      <Stack.Protected guard={!isAuthenticated}>
+        <Stack.Screen name="login" />
+      </Stack.Protected>
     </Stack>
   );
 }

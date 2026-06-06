@@ -1,12 +1,10 @@
-import { Redirect, useRouter } from "expo-router";
-import { useState } from "react";
+import { Redirect } from "expo-router";
+import { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -14,50 +12,79 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
-import { useTheme } from "@/hooks/use-theme";
 import { TextField } from "@/components/ui/TextField";
 import { Button, ButtonText } from "@/components/ui/Button";
+import { isAxiosError } from "axios";
+import { ApiErrorResponse } from "@/api/shared";
+import { signUp } from "@/api/auth";
+import { useMutation } from "@tanstack/react-query";
+import { Loading } from "@/components/ui/Loading";
+import { showToast } from "@/lib/toast";
 
 type Mode = "login" | "register";
 
 export default function LoginScreen() {
-  const router = useRouter();
-  const { isAuthenticated, signIn, signUp } = useAuth();
+  const { isAuthenticated, signIn } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  if (isAuthenticated) return <Redirect href="/home" />;
+  const isValid = username.length && password.length;
+
+  const {
+    mutateAsync: signInMutation,
+    isPending: isSigningIn,
+    error: signInError,
+  } = useMutation({
+    mutationFn: signIn,
+  });
+
+  const {
+    mutateAsync: signUpMutation,
+    isPending: isSigningUp,
+    error: signUpError,
+  } = useMutation({
+    mutationFn: signUp,
+    onSuccess: () => {
+      showToast("User created! Now you can sign in");
+      setMode("login");
+    },
+  });
+
+  const errorMessage = useMemo(() => {
+    const err = signInError ?? signUpError;
+    if (!err) return null;
+    if (isAxiosError<ApiErrorResponse>(err) && err.response?.data.message) {
+      return err.response.data.message;
+    }
+    return "Error authenticating";
+  }, [signInError, signUpError]);
+
+  const submitting = isSigningIn || isSigningUp;
 
   const isLogin = mode === "login";
   const title = isLogin ? "Sign in" : "Create account";
-  const submitLabel = submitting
-    ? "..."
-    : isLogin
-      ? "Sign in"
-      : "Create account";
+
+  const submitLabel = useMemo(() => {
+    if (submitting) return <Loading />;
+    return isLogin ? "Sign in" : "Create account";
+  }, [submitting, isLogin]);
+
   const switchLabel = isLogin
     ? "Don't have an account? Create one"
     : "Already have an account? Sign in";
 
   const handleSubmit = async () => {
-    setError(null);
-    setSubmitting(true);
     try {
       if (isLogin) {
-        await signIn({ username, password });
+        await signInMutation({ username, password });
       } else {
-        await signUp({ username, password });
+        await signUpMutation({ username, password });
       }
-      router.replace("/home");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Authentication failed");
-    } finally {
-      setSubmitting(false);
-    }
+    } catch {}
   };
+
+  if (isAuthenticated) return <Redirect href="/home" />;
 
   return (
     <ThemedView style={styles.container}>
@@ -70,10 +97,12 @@ export default function LoginScreen() {
             {title}
           </ThemedText>
 
-          {error && (
-            <ThemedView type="backgroundElement" style={styles.errorBox}>
-              <ThemedText type="small" themeColor="textSecondary">
-                {error}
+          {errorMessage && (
+            <ThemedView type="backgroundError" style={styles.errorBox}>
+              <ThemedText type="small" themeColor="error">
+                {Array.isArray(errorMessage)
+                  ? errorMessage.map((m) => `- ${m}`).join("\n")
+                  : errorMessage}
               </ThemedText>
             </ThemedView>
           )}
@@ -89,7 +118,6 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete="username"
-              editable={!submitting}
             />
           </ThemedView>
 
@@ -105,11 +133,10 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               autoComplete={isLogin ? "current-password" : "new-password"}
-              editable={!submitting}
             />
           </ThemedView>
 
-          <Button onPress={handleSubmit} disabled={submitting}>
+          <Button onPress={handleSubmit} disabled={submitting || !isValid}>
             <ButtonText>{submitLabel}</ButtonText>
           </Button>
 

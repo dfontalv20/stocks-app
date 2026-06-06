@@ -12,7 +12,8 @@ export type ThemedTextProps = TextProps & {
     | "subtitle"
     | "link"
     | "linkPrimary"
-    | "code";
+    | "code"
+    | "error";
   themeColor?: ThemeColor;
 };
 
@@ -36,6 +37,7 @@ export function ThemedText({
         type === "link" && styles.link,
         type === "linkPrimary" && styles.linkPrimary,
         type === "code" && styles.code,
+        type === "error" && styles.error,
         style,
       ]}
       {...rest}
@@ -52,6 +54,11 @@ const styles = StyleSheet.create({
   link: { lineHeight: 30, fontSize: 14 },
   linkPrimary: { lineHeight: 30, fontSize: 14, color: "#3c87f7" },
   code: {
+    fontFamily: Fonts.mono,
+    fontWeight: Platform.select({ android: "700" }) ?? "500",
+    fontSize: 12,
+  },
+  error: {
     fontFamily: Fonts.mono,
     fontWeight: Platform.select({ android: "700" }) ?? "500",
     fontSize: 12,

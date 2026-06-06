@@ -18,7 +18,7 @@ export const Button: FC<PressableProps> = ({ children, ...props }) => {
         styles.button,
         {
           backgroundColor: theme.backgroundSelected,
-          opacity: pressed || props.disabled ? 0.7 : 1,
+          opacity: pressed || props.disabled ? 0.3 : 1,
         },
       ]}
     >
