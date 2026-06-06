@@ -24,7 +24,7 @@ export const Colors = {
     backgroundSelected: "#2E3135",
     textSecondary: "#B0B4BA",
     backgroundError: "#D4000026",
-    error: "#7d0909",
+    error: "#FF0000FF",
   },
 } as const;
 
