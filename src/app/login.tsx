@@ -1,4 +1,3 @@
-import { Redirect } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -14,12 +13,11 @@ import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
 import { TextField } from "@/components/ui/TextField";
 import { Button, ButtonText } from "@/components/ui/Button";
-import { isAxiosError } from "axios";
-import { ApiErrorResponse } from "@/api/shared";
 import { signUp } from "@/api/auth";
 import { useMutation } from "@tanstack/react-query";
 import { Loading } from "@/components/ui/Loading";
 import { showToast } from "@/lib/toast";
+import { getApiErrorMessage } from "@/lib/api";
 
 type Mode = "login" | "register";
 
@@ -54,10 +52,7 @@ export default function LoginScreen() {
   const errorMessage = useMemo(() => {
     const err = signInError ?? signUpError;
     if (!err) return null;
-    if (isAxiosError<ApiErrorResponse>(err) && err.response?.data.message) {
-      return err.response.data.message;
-    }
-    return "Error authenticating";
+    return getApiErrorMessage(err) ?? "Error authenticating";
   }, [signInError, signUpError]);
 
   const submitting = isSigningIn || isSigningUp;

@@ -1,13 +1,13 @@
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { Loading } from "@/components/ui/Loading";
-import { Separator } from "@/components/ui/Separator";
 import { Spacing } from "@/constants/theme";
 import { getAlerts } from "@/api/alerts";
 import { useQuery } from "@tanstack/react-query";
 import { FlatList, StyleSheet } from "react-native";
+import { NewAlertButton } from "@/components/alerts/NewAlertButton";
 import { AlertRow } from "@/components/alerts/AlertRow";
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Separator } from "@/components/ui/Separator";
 
 export default function AlertsScreen() {
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
@@ -15,14 +15,11 @@ export default function AlertsScreen() {
     queryFn: getAlerts,
   });
 
-  if (isLoading || isRefetching) return <Loading />;
+  if (isLoading) return <Loading />;
   if (error) {
     return (
       <ThemedView style={styles.centered}>
         <ThemedText>Failed to load alerts</ThemedText>
-        <Button onPress={() => refetch()}>
-          <ButtonText>Retry</ButtonText>
-        </Button>
       </ThemedView>
     );
   }
@@ -31,6 +28,7 @@ export default function AlertsScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <NewAlertButton onAlertCreated={refetch} />
       <FlatList
         data={alerts}
         keyExtractor={(item) => String(item.id)}
@@ -53,15 +51,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: Spacing.four,
+    gap: Spacing.three,
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: Spacing.four,
   },
+
   list: {
     paddingBottom: Spacing.four,
+    gap: Spacing.two,
   },
   empty: {
     textAlign: "center",
