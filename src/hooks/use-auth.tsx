@@ -4,10 +4,14 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   type ReactNode,
 } from "react";
 import { AuthResponse, Credentials, signIn as signInRequest } from "@/api/auth";
+import { DeviceEventEmitter } from "react-native";
+import { SESSION_EXPIRED_EVENT } from "@/constants/session";
+import { showToast } from "@/lib/toast";
 
 type AuthState = {
   token: string | null;
@@ -49,6 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await clearStoredSession();
     await refetch();
   }, [refetch]);
+
+  const handleSessionExpired = useCallback(async () => {
+    await signOut();
+    showToast("Session expired. Please sign in again.");
+  }, [signOut]);
+
+  useEffect(() => {
+    const listener = DeviceEventEmitter.addListener(
+      SESSION_EXPIRED_EVENT,
+      handleSessionExpired,
+    );
+    return () => {
+      listener.remove();
+    };
+  }, [handleSessionExpired]);
 
   const value: AuthContextValue = useMemo(
     () => ({

@@ -2,6 +2,7 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { TextField } from "@/components/ui/TextField";
 import { Loading } from "@/components/ui/Loading";
+import { Separator } from "@/components/ui/Separator";
 import { Spacing } from "@/constants/theme";
 import { getStocks } from "@/api/stocks";
 import { useQuery } from "@tanstack/react-query";
@@ -43,7 +44,7 @@ export default function SearchScreen() {
           </ThemedText>
         }
         contentContainerStyle={styles.list}
-        ItemSeparatorComponent={() => <ThemedView style={styles.separator} />}
+        ItemSeparatorComponent={Separator}
       />
     );
   };
@@ -74,10 +75,6 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: Spacing.four,
-  },
-  separator: {
-    height: Spacing.two,
-    backgroundColor: "transparent",
   },
   empty: {
     textAlign: "center",

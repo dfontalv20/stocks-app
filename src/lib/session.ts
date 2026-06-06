@@ -1,5 +1,5 @@
+import { SESSION_KEY } from "@/constants/session";
 import * as SecureStore from "expo-secure-store";
-export const SESSION_KEY = "auth.session";
 
 export async function loadSession(): Promise<string | null> {
   try {
