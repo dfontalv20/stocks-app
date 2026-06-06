@@ -3,7 +3,6 @@ import apiClient from "./client";
 export type UserResponse = {
   id: number;
   username: string;
-  password: string;
   fcmToken: string;
 };
 
@@ -30,4 +29,8 @@ export async function signUp(credentials: Credentials) {
       password: credentials.password,
     })
   ).data;
+}
+
+export async function getUser() {
+  return (await apiClient.get<UserResponse>("/auth/user")).data;
 }

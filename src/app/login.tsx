@@ -84,8 +84,6 @@ export default function LoginScreen() {
     } catch {}
   };
 
-  if (isAuthenticated) return <Redirect href="/home" />;
-
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
