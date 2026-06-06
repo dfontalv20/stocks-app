@@ -24,7 +24,7 @@ import { showToast } from "@/lib/toast";
 type Mode = "login" | "register";
 
 export default function LoginScreen() {
-  const { isAuthenticated, signIn } = useAuth();
+  const { signIn } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
