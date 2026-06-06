@@ -1,15 +1,31 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from "react-native";
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { Loading } from "@/components/ui/Loading";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+function AppStack() {
+  const { isLoading } = useAuth();
+  if (isLoading) return <Loading />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" />
+      <Stack.Screen name="home" />
+    </Stack>
+  );
+}
 
-export default function TabLayout() {
+const queryClient = new QueryClient();
+
+export default function RootLayout() {
   const colorScheme = useColorScheme();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AppStack />
+        </AuthProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }
