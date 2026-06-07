@@ -22,10 +22,10 @@ export const AlertForm: FC<AlertFormProps> = ({ onSuccess, onCancel }) => {
     handleSubmit,
     formState: { isValid, errors },
     setError,
-  } = useForm<CreateAlertDto>({
+  } = useForm<Pick<CreateAlertDto, "stock"> & { price: string }>({
     defaultValues: {
       stock: "",
-      price: 0,
+      price: "",
     },
   });
 
@@ -80,12 +80,16 @@ export const AlertForm: FC<AlertFormProps> = ({ onSuccess, onCancel }) => {
           name="price"
           rules={{
             required: "Price is required",
+            pattern: { value: /^\d*\.?\d{0,2}$/, message: "Invalid price" },
             min: { value: 1, message: "Price must be greater than 1" },
           }}
           render={({ field }) => (
             <TextField
               value={field.value + ""}
-              onChangeText={(text) => field.onChange(+text)}
+              onChangeText={(text) => {
+                if (/^\d*\.?\d{0,2}?$/.test(text)) field.onChange(text);
+              }}
+              inputMode="decimal"
               placeholder="0.00"
               keyboardType="decimal-pad"
               autoCorrect={false}
@@ -104,7 +108,9 @@ export const AlertForm: FC<AlertFormProps> = ({ onSuccess, onCancel }) => {
 
       <Button
         disabled={isPending || !isValid}
-        onPress={handleSubmit((values) => mutate(values))}
+        onPress={handleSubmit((values) =>
+          mutate({ ...values, price: parseFloat(values.price) }),
+        )}
       >
         <ButtonText>{isPending ? "Creating..." : "Create alert"}</ButtonText>
       </Button>

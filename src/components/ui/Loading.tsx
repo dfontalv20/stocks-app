@@ -1,10 +1,11 @@
 import { useTheme } from "@/hooks/use-theme";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { FC } from "react";
+import { ActivityIndicator, StyleSheet, View, ViewProps } from "react-native";
 
-export const Loading = () => {
+export const Loading: FC<ViewProps> = ({ style, ...props }) => {
   const theme = useTheme();
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View {...props} style={[styles.container, style]}>
       <ActivityIndicator color={theme.text} />
     </View>
   );
