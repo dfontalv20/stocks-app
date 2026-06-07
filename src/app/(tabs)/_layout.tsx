@@ -10,6 +10,7 @@ import {
   setBackgroundMessageHandler,
 } from "@react-native-firebase/messaging";
 import { showToast } from "@/lib/toast";
+import { useStocksWebSocket } from "@/hooks/use-finnhub-websocket";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function HomeLayout() {
@@ -18,6 +19,8 @@ export default function HomeLayout() {
   const styles = StyleSheet.create({
     label: { color: theme.text },
   });
+
+  useStocksWebSocket();
 
   useEffect(() => {
     const invalidateData = () => {
