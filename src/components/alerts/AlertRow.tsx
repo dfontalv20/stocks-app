@@ -35,9 +35,13 @@ export const AlertRow: FC<
         <ThemedText type="small" themeColor="textSecondary">
           {`Target: $${alert.price.toFixed(2)}`}
         </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
+        <ThemedText
+          type="small"
+          themeColor="textSecondary"
+          style={!!alert.notifiedAt ? styles.notified : undefined}
+        >
           {alert.notifiedAt
-            ? `Notified: ${new Date(alert.notifiedAt).toLocaleString()}`
+            ? `Notified: ${new Date(Date.parse(alert.notifiedAt)).toLocaleString()}`
             : "Not notified yet"}
         </ThemedText>
       </ThemedView>
@@ -68,5 +72,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.two,
+  },
+  notified: {
+    color: "#27ae60",
   },
 });

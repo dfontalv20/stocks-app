@@ -38,7 +38,6 @@ export type RecommendationWithQuote = {
 };
 
 export async function getStocks(params: { search: string }) {
-  console.log(params);
   return (await apiClient.get<StocksResponse>("/stocks", { params })).data;
 }
 

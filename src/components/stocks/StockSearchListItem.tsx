@@ -32,7 +32,7 @@ export const StockSearchListItem: FC<StockSearchListItemProps> = ({
   const theme = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: ["recommendations", stock.symbol],
+    queryKey: ["stock", stock.symbol],
     queryFn: () => getStockRecommendations({ symbol: stock.symbol }),
     enabled: isOpen,
   });

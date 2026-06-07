@@ -14,11 +14,12 @@ import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
 import { TextField } from "@/components/ui/TextField";
 import { Button, ButtonText } from "@/components/ui/Button";
-import { signUp } from "@/api/auth";
+import { Credentials, signUp } from "@/api/auth";
 import { useMutation } from "@tanstack/react-query";
 import { Loading } from "@/components/ui/Loading";
 import { showToast } from "@/lib/toast";
 import { getApiErrorMessage } from "@/lib/api";
+import { getToken, getMessaging } from "@react-native-firebase/messaging";
 
 type Mode = "login" | "register";
 
@@ -35,7 +36,8 @@ export default function LoginScreen() {
     isPending: isSigningIn,
     error: signInError,
   } = useMutation({
-    mutationFn: signIn,
+    mutationFn: async (credentials: Credentials) =>
+      signIn({ ...credentials, fcmToken: await getToken(getMessaging()) }),
   });
 
   const {

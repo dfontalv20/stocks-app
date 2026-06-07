@@ -11,18 +11,19 @@ export type AuthResponse = { accessToken: string };
 export type Credentials = {
   username: string;
   password: string;
+  fcmToken?: string;
 };
 
 export async function signIn(credentials: Credentials) {
   const res = await apiClient.post<AuthResponse>("/auth/signIn", {
     username: credentials.username,
     password: credentials.password,
-    fcmToken: "",
+    fcmToken: credentials.fcmToken || undefined,
   });
   return res.data;
 }
 
-export async function signUp(credentials: Credentials) {
+export async function signUp(credentials: Omit<Credentials, "fcmToken">) {
   return (
     await apiClient.post<UserResponse>("/auth/signUp", {
       username: credentials.username,
