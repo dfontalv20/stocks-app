@@ -4,6 +4,7 @@ import { Spacing } from "@/constants/theme";
 import { useDebounce } from "use-debounce";
 import { StocksList } from "@/components/stocks/StocksList";
 import { StyleSheet } from "react-native";
+import { StockSearchListItem } from "@/components/stocks/StockSearchListItem";
 
 export default function SearchScreen() {
   const [search, setSearch] = useDebounce("", 800);
@@ -15,7 +16,10 @@ export default function SearchScreen() {
         autoCapitalize="none"
         autoCorrect={false}
       />
-      <StocksList search={search} />
+      <StocksList
+        search={search}
+        renderItem={({ item }) => <StockSearchListItem stock={item} />}
+      />
     </ThemedView>
   );
 }
