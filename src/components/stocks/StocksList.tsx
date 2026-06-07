@@ -1,14 +1,12 @@
 import { FC } from "react";
-import { ThemedView } from "../ui/ThemedView";
 import { ThemedText } from "../ui/ThemedText";
 import { Spacing } from "@/constants/theme";
-import { FlatList, FlatListProps, StyleSheet } from "react-native";
+import { FlatList, FlatListProps, StyleSheet, View } from "react-native";
 import { Separator } from "../ui/Separator";
 import { useStocksQuery } from "@/hooks/use-stocks-query";
 import { Loading } from "../ui/Loading";
 import { StockRow } from "./StockRow";
 import { Stock } from "@/api/stocks";
-import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export interface StocksListProps extends Omit<
@@ -38,9 +36,7 @@ export const StocksList: FC<StocksListProps> = ({ search, ...props }) => {
   const stocks = data?.result ?? [];
   return (
     <FlatList
-      keyExtractor={(item) =>
-        `${item.symbol}-${item.displaySymbol}-${item.type}`
-      }
+      keyExtractor={(item) => `${item.symbol}-${item.description}-${item.type}`}
       renderItem={({ item }) => <StockRow stock={item} />}
       ListEmptyComponent={
         <View style={styles.centered}>

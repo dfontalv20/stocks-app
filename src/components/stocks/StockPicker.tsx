@@ -48,9 +48,13 @@ export const StockPicker: FC<StockPickerProps> = ({
               onPress={() => onSelect?.(item)}
             >
               <StockRow style={styles.row} stock={item} />
-              {isSelected && (
-                <Ionicons name="checkmark" size={24} color={theme.text} />
-              )}
+
+              <Ionicons
+                name="checkmark"
+                size={24}
+                color={theme.text}
+                style={[{ opacity: isSelected ? 1 : 0 }]}
+              />
             </TouchableOpacity>
           );
         }}
@@ -70,5 +74,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.three,
   },
-  row: { backgroundColor: "transparent" },
+  row: { backgroundColor: "transparent", flex: 1, flexShrink: 1 },
 });

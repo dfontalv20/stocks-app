@@ -28,6 +28,7 @@ export default function AlertsScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <ThemedText type="title">Alerts</ThemedText>
       <NewAlertButton onAlertCreated={refetch} />
       <FlatList
         data={alerts}

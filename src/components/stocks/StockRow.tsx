@@ -15,7 +15,7 @@ export const StockRow: FC<
       style={[styles.row, props.style]}
     >
       <View style={styles.rowContent}>
-        <ThemedText type="smallBold" style={styles.name}>
+        <ThemedText type="smallBold" numberOfLines={2} style={styles.name}>
           {stock.description}
         </ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
@@ -36,11 +36,11 @@ const styles = StyleSheet.create({
     gap: Spacing.half,
   },
   name: {
+    maxWidth: "50%",
     fontSize: 18,
   },
   rowContent: {
     gap: Spacing.two,
-    alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
   },

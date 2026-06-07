@@ -1,11 +1,9 @@
-import { Pressable, StyleSheet } from "react-native";
-import { ThemedView } from "../ui/ThemedView";
+import { StyleSheet } from "react-native";
 import { ThemedText } from "../ui/ThemedText";
 import { AlertForm } from "./AlertForm";
 import { Spacing } from "@/constants/theme";
 import { Button, ButtonText } from "../ui/Button";
 import { ComponentProps, FC, useState } from "react";
-import { useTheme } from "@/hooks/use-theme";
 import { Modal } from "../ui/Modal";
 
 export interface NewAlertButtonProps extends ComponentProps<typeof Button> {
@@ -16,7 +14,6 @@ export const NewAlertButton: FC<NewAlertButtonProps> = ({
   onAlertCreated,
   ...props
 }) => {
-  const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   const openModal = () => setModalVisible(true);

@@ -1,5 +1,5 @@
 import { clearStoredSession, loadSession, persistSession } from "@/lib/session";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   useCallback,
@@ -29,6 +29,8 @@ type AuthContextValue = AuthState & {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
+
   const {
     data: token,
     isLoading,
@@ -51,8 +53,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await clearStoredSession();
+    await queryClient.removeQueries();
     await refetch();
-  }, [refetch]);
+  }, [queryClient, refetch]);
 
   const handleSessionExpired = useCallback(async () => {
     await signOut();
