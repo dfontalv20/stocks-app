@@ -2,7 +2,7 @@ import { Stock } from "@/api/stocks";
 import { Spacing } from "@/constants/theme";
 import { ThemedView } from "../ui/ThemedView";
 import { ThemedText } from "../ui/ThemedText";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { ComponentProps, FC } from "react";
 
 export const StockRow: FC<
@@ -14,9 +14,16 @@ export const StockRow: FC<
       {...props}
       style={[styles.row, props.style]}
     >
-      <ThemedText type="smallBold">{stock.displaySymbol}</ThemedText>
+      <View style={styles.rowContent}>
+        <ThemedText type="smallBold" style={styles.name}>
+          {stock.description}
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {stock.displaySymbol}
+        </ThemedText>
+      </View>
       <ThemedText type="small" themeColor="textSecondary">
-        {stock.description}
+        {stock.type}
       </ThemedText>
     </ThemedView>
   );
@@ -27,5 +34,14 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: Spacing.two,
     gap: Spacing.half,
+  },
+  name: {
+    fontSize: 18,
+  },
+  rowContent: {
+    gap: Spacing.two,
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexDirection: "row",
   },
 });

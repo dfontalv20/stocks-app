@@ -9,6 +9,7 @@ import { Loading } from "../ui/Loading";
 import { StockRow } from "./StockRow";
 import { Stock } from "@/api/stocks";
 import { View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export interface StocksListProps extends Omit<
   Partial<FlatListProps<Stock>>,
@@ -22,6 +23,7 @@ export const StocksList: FC<StocksListProps> = ({ search, ...props }) => {
   if (!search)
     return (
       <View style={styles.centered}>
+        <Ionicons name="search" size={36} color="gray" />
         <ThemedText>Enter a search term</ThemedText>
       </View>
     );
@@ -36,12 +38,16 @@ export const StocksList: FC<StocksListProps> = ({ search, ...props }) => {
   const stocks = data?.result ?? [];
   return (
     <FlatList
-      keyExtractor={(item) => `${item.symbol}-${item.displaySymbol}`}
+      keyExtractor={(item) =>
+        `${item.symbol}-${item.displaySymbol}-${item.type}`
+      }
       renderItem={({ item }) => <StockRow stock={item} />}
       ListEmptyComponent={
-        <ThemedText themeColor="textSecondary" style={styles.empty}>
-          No stocks match your search
-        </ThemedText>
+        <View style={styles.centered}>
+          <ThemedText themeColor="textSecondary" style={styles.empty}>
+            No stocks match your search
+          </ThemedText>
+        </View>
       }
       ItemSeparatorComponent={Separator}
       {...props}
@@ -59,6 +65,7 @@ const styles = StyleSheet.create({
   },
   centered: {
     flex: 1,
+    gap: Spacing.three,
     alignItems: "center",
     justifyContent: "center",
   },
