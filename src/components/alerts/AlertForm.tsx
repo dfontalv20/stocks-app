@@ -1,14 +1,20 @@
 import { ThemedText } from "../ui/ThemedText";
-import { ThemedView } from "../ui/ThemedView";
 import { TextField } from "../ui/TextField";
 import { Button, ButtonText } from "../ui/Button";
 import { Spacing } from "@/constants/theme";
 import { createAlert, type CreateAlertDto } from "@/api/alerts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FC } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+  Dimensions,
+} from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { getApiErrorMessage } from "@/lib/api";
+import { StockPicker } from "../stocks/StockPicker";
 
 type AlertFormProps = {
   onSuccess?: () => void;
@@ -17,6 +23,8 @@ type AlertFormProps = {
 
 export const AlertForm: FC<AlertFormProps> = ({ onSuccess, onCancel }) => {
   const queryClient = useQueryClient();
+
+  const { height } = Dimensions.get("screen");
   const {
     control,
     handleSubmit,
@@ -49,29 +57,34 @@ export const AlertForm: FC<AlertFormProps> = ({ onSuccess, onCancel }) => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={styles.container}
     >
-      <ThemedView type="backgroundElement" style={styles.field}>
-        <ThemedText type="smallBold" style={styles.label}>
-          Stock symbol
-        </ThemedText>
+      <View style={styles.field}>
         <Controller
           control={control}
           name="stock"
           rules={{ required: "Must select a stock" }}
           render={({ field }) => (
-            <TextField
-              value={field.value}
-              onChangeText={field.onChange}
-              placeholder="e.g. AAPL"
-              autoCapitalize="characters"
-              autoCorrect={false}
-              autoComplete="off"
-              editable={!isPending}
-            />
+            <>
+              <ThemedText type="smallBold" style={styles.label}>
+                Stock symbol{" "}
+                {field.value && (
+                  <ThemedText type="smallBold" themeColor="textSecondary">
+                    (Selected: {field.value})
+                  </ThemedText>
+                )}
+              </ThemedText>
+              <StockPicker
+                onSelect={(stock) => {
+                  field.onChange(stock.symbol);
+                }}
+                value={field.value}
+                style={{ height: height * 0.3 }}
+              />
+            </>
           )}
         />
-      </ThemedView>
+      </View>
 
-      <ThemedView type="backgroundElement" style={styles.field}>
+      <View style={styles.field}>
         <ThemedText type="smallBold" style={styles.label}>
           Target price
         </ThemedText>
@@ -98,7 +111,7 @@ export const AlertForm: FC<AlertFormProps> = ({ onSuccess, onCancel }) => {
             />
           )}
         />
-      </ThemedView>
+      </View>
 
       {errorMessage && (
         <ThemedText type="small" themeColor="error" style={styles.error}>
@@ -130,7 +143,6 @@ const styles = StyleSheet.create({
   },
   field: {
     gap: Spacing.one,
-    padding: Spacing.three,
     borderRadius: Spacing.three,
   },
   label: {

@@ -4,6 +4,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -91,16 +92,16 @@ export default function LoginScreen() {
           </ThemedText>
 
           {errorMessage && (
-            <ThemedView type="backgroundError" style={styles.errorBox}>
+            <View style={styles.errorBox}>
               <ThemedText type="small" themeColor="error">
                 {Array.isArray(errorMessage)
                   ? errorMessage.map((m) => `- ${m}`).join("\n")
                   : errorMessage}
               </ThemedText>
-            </ThemedView>
+            </View>
           )}
 
-          <ThemedView type="backgroundElement" style={styles.field}>
+          <View style={styles.field}>
             <ThemedText type="smallBold" style={styles.label}>
               Username
             </ThemedText>
@@ -112,9 +113,9 @@ export default function LoginScreen() {
               autoCorrect={false}
               autoComplete="username"
             />
-          </ThemedView>
+          </View>
 
-          <ThemedView type="backgroundElement" style={styles.field}>
+          <ThemedView type="background" style={styles.field}>
             <ThemedText type="smallBold" style={styles.label}>
               Password
             </ThemedText>
@@ -173,8 +174,6 @@ const styles = StyleSheet.create({
   },
   field: {
     gap: Spacing.one,
-    padding: Spacing.three,
-    borderRadius: Spacing.three,
   },
   label: {
     marginBottom: Spacing.half,
