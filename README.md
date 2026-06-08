@@ -1,56 +1,140 @@
-# Welcome to your Expo app 👋
+# Stocks App — Real-Time Stock Tracking & Alerts
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application for real-time stock tracking and price alert management. Built with Expo SDK 56, this app delivers live market data via Finnhub WebSockets, interactive charts, and push notifications through Firebase Cloud Messaging (FCM).
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Authentication** — Secure login flow with persistent session management.
+- **Real-Time Stock Data** — Live price updates streamed via Finnhub WebSocket.
+- **Interactive Charts** — Visualize stock performance with `react-native-gifted-charts`.
+- **Price Alerts** — Create and manage custom stock price thresholds.
+- **Push Notifications** — FCM-powered alerts when a price crosses your threshold.
+- **Dark/Light Mode** — Native theme support via Expo Router's `ThemeProvider`.
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+- **React Native** 0.85 — Cross-platform UI framework.
+- **Expo SDK 56** — Managed workflow with Expo Router v3 (file-based routing).
+- **pnpm** — Fast, disk-efficient package manager.
+- **React 19** — Latest concurrent features with React Compiler enabled.
+- **TypeScript 6** — Strict-type checking across the entire codebase.
+- **@tanstack/react-query** — Server state and cache management.
+- **Firebase** — FCM for push notifications (configured via Expo Config Plugins).
+- **Finnhub API** — Real-time stock data via WebSocket.
 
-   ```bash
-   npx expo start
-   ```
+## Architecture & Conventions
 
-In the output, you'll find options to open the app in a
+The project follows a **feature-based architecture** under `src/`. All business logic, components, and API layers are organized by domain rather than by technical role.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Coding Conventions
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+| Convention | Rule |
+|---|---|
+| **File names** | `kebab-case` (e.g., `stock-chart.tsx`, `use-color-scheme.ts`) |
+| **Indentation** | 2 spaces, no tabs |
+| **Imports** | External first, blank line, then `@/` aliases |
+| **Components** | PascalCase exports; platform-specific files use `.web.tsx` / `.ios.tsx` / `.android.tsx` |
+| **Design System** | Use `ThemedText` / `ThemedView` instead of raw `Text` / `View` — they read from `src/constants/theme.ts` and automatically adapt to dark/light mode |
+| **Memoization** | React Compiler is enabled; avoid `useMemo` / `useCallback` / `React.memo` unless profiling proves necessary |
+| **Hooks** | Custom hooks in `src/hooks/` — prefixed with `use-` |
 
-## Get a fresh project
+## Getting Started
 
-When you're ready, run:
+### Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- pnpm installed globally
 
 ```bash
-npm run reset-project
+npm install -g pnpm
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Expo CLI (optional — `pnpm expo` uses the local SDK)
 
-### Other setup steps
+### Installation
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+git clone <repository-url>
+cd stocks-app
+pnpm install
+```
 
-## Learn more
+### Running the App
 
-To learn more about developing your project with Expo, look at the following resources:
+Start the Expo development server:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+pnpm start
+```
 
-## Join the community
+Once the Metro bundler loads, press:
 
-Join our community of developers creating universal apps.
+- **`a`** — Open on Android emulator / connected device
+- **`i`** — Open on iOS simulator (macOS only)
+- **`w`** — Open in web browser
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+For native builds (required for Firebase/FCM):
+
+```bash
+pnpm android   # expo run:android
+pnpm ios       # expo run:ios
+```
+
+## Project Structure
+
+```
+stocks-app/
+├── assets/               # Images, fonts, and icons
+│   ├── expo.icon/
+│   └── images/
+├── src/
+│   ├── app/              # Expo Router file-based routes
+│   │   ├── _layout.tsx   # Root layout (providers, theme)
+│   │   ├── index.tsx     # Home / stock list screen
+│   │   ├── login.tsx     # Authentication screen
+│   │   └── (tabs)/       # Tab navigator routes
+│   ├── api/              # Backend API clients & Firebase helpers
+│   │   ├── client.ts     # Axios instance with interceptors
+│   │   ├── auth.ts       # Auth API calls
+│   │   ├── stocks.ts     # Stock data API calls
+│   │   ├── alerts.ts     # Alert API calls
+│   │   └── shared.ts     # Shared API types & utilities
+│   ├── components/       # Reusable UI components
+│   │   ├── ui/           # Primitives (ThemedText, ThemedView, etc.)
+│   │   ├── stocks/       # Stock list, chart, search components
+│   │   ├── alerts/       # Alert form, alert list components
+│   │   └── Header.tsx
+│   ├── constants/        # App-wide constants & theme tokens
+│   │   ├── theme.ts      # Color palette, spacing scale
+│   │   └── session.ts    # Session configuration
+│   ├── hooks/            # Custom React hooks
+│   │   ├── use-auth.tsx
+│   │   ├── use-theme.ts
+│   │   ├── use-color-scheme.ts
+│   │   ├── use-stocks-query.ts
+│   │   └── use-finnhub-websocket.ts
+│   ├── lib/              # Utility modules
+│   │   ├── api.ts        # Generic API helpers
+│   │   ├── session.ts    # Session storage (SecureStore)
+│   │   └── toast.ts      # Toast notification helpers
+│   └── global.css        # Global styles
+├── app.json              # Expo configuration
+├── tsconfig.json         # TypeScript config with @/ path alias
+├── pnpm-lock.yaml
+└── package.json
+```
+
+## Available Scripts
+
+| Command | Description |
+|---|---|
+| `pnpm start` | Start the Expo dev server |
+| `pnpm android` | Build and run on Android |
+| `pnpm ios` | Build and run on iOS |
+| `pnpm web` | Start dev server targeting web |
+| `pnpm lint` | Run ESLint via `expo lint` |
+| `pnpm format` | Format all files with Prettier |
+| `pnpm format:check` | Check formatting without writing |
+| `pnpm exec tsc --noEmit` | Type-check the project |
+
+> **Note:** No test runner is currently configured. This repository uses `pnpm` as the package manager — do **not** use `npm` or `yarn`.

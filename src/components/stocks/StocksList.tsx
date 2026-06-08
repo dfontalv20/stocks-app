@@ -1,0 +1,77 @@
+import { FC } from "react";
+import { ThemedText } from "../ui/ThemedText";
+import { Spacing } from "@/constants/theme";
+import { FlatList, FlatListProps, StyleSheet, View } from "react-native";
+import { Separator } from "../ui/Separator";
+import { useStocksQuery } from "@/hooks/use-stocks-query";
+import { Loading } from "../ui/Loading";
+import { StockRow } from "./StockRow";
+import { Stock } from "@/api/stocks";
+import { Ionicons } from "@expo/vector-icons";
+
+export interface StocksListProps extends Omit<
+  Partial<FlatListProps<Stock>>,
+  "data"
+> {
+  search: string;
+}
+
+export const StocksList: FC<StocksListProps> = ({ search, ...props }) => {
+  const { data, isLoading, error } = useStocksQuery({ search });
+  if (!search)
+    return (
+      <View style={styles.centered}>
+        <Ionicons name="search" size={36} color="gray" />
+        <ThemedText>Enter a search term</ThemedText>
+      </View>
+    );
+  if (isLoading) return <Loading />;
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <ThemedText>Failed to load stocks</ThemedText>
+      </View>
+    );
+  }
+  const stocks = data?.result ?? [];
+  return (
+    <FlatList
+      keyExtractor={(item) => `${item.symbol}-${item.description}-${item.type}`}
+      renderItem={({ item }) => <StockRow stock={item} />}
+      ListEmptyComponent={
+        <View style={styles.centered}>
+          <ThemedText themeColor="textSecondary" style={styles.empty}>
+            No stocks match your search
+          </ThemedText>
+        </View>
+      }
+      ItemSeparatorComponent={Separator}
+      {...props}
+      contentContainerStyle={[styles.list, props.contentContainerStyle]}
+      data={stocks}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: Spacing.four,
+    gap: Spacing.three,
+  },
+  centered: {
+    flex: 1,
+    gap: Spacing.three,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  list: {
+    paddingBottom: Spacing.four,
+    gap: Spacing.two,
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: Spacing.four,
+  },
+});
