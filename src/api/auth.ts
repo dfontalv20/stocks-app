@@ -35,3 +35,7 @@ export async function signUp(credentials: Omit<Credentials, "fcmToken">) {
 export async function getUser() {
   return (await apiClient.get<UserResponse>("/auth/user")).data;
 }
+
+export async function signOut() {
+  await apiClient.post("/auth/signOut");
+}

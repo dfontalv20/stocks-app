@@ -8,10 +8,16 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { AuthResponse, Credentials, signIn as signInRequest } from "@/api/auth";
+import {
+  AuthResponse,
+  Credentials,
+  signIn as signInRequest,
+  signOut as signOutRequest,
+} from "@/api/auth";
 import { DeviceEventEmitter } from "react-native";
 import { SESSION_EXPIRED_EVENT } from "@/constants/session";
 import { showToast } from "@/lib/toast";
+import { deleteToken, getMessaging } from "@react-native-firebase/messaging";
 
 type AuthState = {
   token: string | null;
@@ -52,8 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
+    try {
+      await signOutRequest();
+    } catch {}
+    try {
+      await deleteToken(getMessaging());
+    } catch {}
     await clearStoredSession();
-    await queryClient.removeQueries();
+    queryClient.removeQueries();
     await refetch();
   }, [queryClient, refetch]);
 
