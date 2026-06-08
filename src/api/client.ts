@@ -1,6 +1,6 @@
 import { SESSION_EXPIRED_EVENT } from "@/constants/session";
 import { loadSession } from "@/lib/session";
-import { create } from "axios";
+import { create, isAxiosError } from "axios";
 import { DeviceEventEmitter } from "react-native";
 
 const apiClient = create({
@@ -25,7 +25,11 @@ apiClient.interceptors.request.use(async (config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
+    if (
+      isAxiosError(error) &&
+      error.config?.headers.Authorization &&
+      error.response?.status === 401
+    ) {
       DeviceEventEmitter.emit(SESSION_EXPIRED_EVENT);
     }
     return Promise.reject(error);
