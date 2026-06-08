@@ -7,17 +7,11 @@
     "icon": "./assets/images/icon.png",
     "scheme": "stocksapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "imageWidth": 578
-    },
     "android": {
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.diegofontalvo.stocksapp"
@@ -31,10 +25,14 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#FFFFFF",
           "android": {
+            "imageWidth": 250,
             "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
+            "dark": {
+              "image": "./assets/images/splash-icon.png",
+              "backgroundColor": "#000000"
+            }
           }
         }
       ],
